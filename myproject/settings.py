@@ -92,11 +92,18 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 # DATABASE
 # =========================
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+import os
+import dj_database_url
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.parse(os.environ.get("DATABASE_URL"))
 }
 
 # =========================
@@ -147,7 +154,9 @@ EMAIL_USE_TLS = True
 
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-
+CSRF_TRUSTED_ORIGINS = [
+    "https://ai-code-mentor-backend-0rmn.onrender.com",
+]
 
 # =========================
 # REST FRAMEWORK + JWT
