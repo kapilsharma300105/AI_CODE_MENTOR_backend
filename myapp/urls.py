@@ -41,6 +41,7 @@ urlpatterns = [
     path('test/', test_mode),
     path('evaluate/', evaluate_answer),
     path('generate-test/', generate_test),
+    
 
     # HISTORY
    
