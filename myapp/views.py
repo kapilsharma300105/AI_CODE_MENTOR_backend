@@ -39,26 +39,49 @@ LANG_MAP = {
 # =========================
 # AI (OLLAMA)
 # =========================
+# def get_ollama_response(prompt):
+#     try:
+#         res = requests.post(
+#             "http://localhost:11434/api/generate",
+#             json={
+#                 "model": "phi3",
+#                 "prompt": prompt,
+#                 "stream": False
+#             },
+#             timeout=30
+#         )
+
+#         if res.status_code == 200:
+#             return res.json().get("response", "No response")
+
+#         return "AI error"
+
+#     except Exception as e:
+#         return str(e)
+
+
 def get_ollama_response(prompt):
     try:
+        api_key = os.environ.get("GROQ_API_KEY")
+        
         res = requests.post(
-            "http://localhost:11434/api/generate",
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json"
+            },
             json={
-                "model": "phi3",
-                "prompt": prompt,
-                "stream": False
+                "model": "llama3-8b-8192",
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": 0.7
             },
             timeout=30
         )
 
-        if res.status_code == 200:
-            return res.json().get("response", "No response")
-
-        return "AI error"
+        return res.json()["choices"][0]["message"]["content"].strip()
 
     except Exception as e:
         return str(e)
-
 
 # =========================
 # SIGNUP
@@ -227,25 +250,56 @@ import json
 # =========================
 # 🔥 OLLAMA AI FUNCTION
 # =========================
+# def get_ai_response(prompt):
+#     try:
+#         res = requests.post(
+#             "http://localhost:11434/api/generate",
+#             json={
+#                 "model": "phi3",
+#                 "prompt": prompt,
+#                 "stream": False,
+#                 "options": {
+#                     "temperature": 0,
+#                     "num_predict": 300
+#                 }
+#             },
+#             timeout=30
+#         )
+
+#         raw = res.json().get("response", "").strip()
+
+#         # Clean markdown fences if model wraps in ```json
+#         if raw.startswith("```"):
+#             raw = raw.strip("`").strip()
+#             if raw.startswith("json"):
+#                 raw = raw[4:].strip()
+
+#         return json.loads(raw)
+
+#     except Exception:
+#         return None
+import os
+
 def get_ai_response(prompt):
     try:
+        api_key = os.environ.get("GROQ_API_KEY")
+        
         res = requests.post(
-            "http://localhost:11434/api/generate",
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json"
+            },
             json={
-                "model": "phi3",
-                "prompt": prompt,
-                "stream": False,
-                "options": {
-                    "temperature": 0,
-                    "num_predict": 300
-                }
+                "model": "llama3-8b-8192",
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": 0
             },
             timeout=30
         )
 
-        raw = res.json().get("response", "").strip()
+        raw = res.json()["choices"][0]["message"]["content"].strip()
 
-        # Clean markdown fences if model wraps in ```json
         if raw.startswith("```"):
             raw = raw.strip("`").strip()
             if raw.startswith("json"):
@@ -253,9 +307,9 @@ def get_ai_response(prompt):
 
         return json.loads(raw)
 
-    except Exception:
+    except Exception as e:
+        print("AI ERROR:", e)
         return None
-
 
 # =========================
 # 🔥 ANALYZE CODE API
