@@ -1,3 +1,4 @@
+import os  
 import json
 import requests
 
@@ -77,10 +78,14 @@ def get_ollama_response(prompt):
             },
             timeout=30
         )
-
+        
+        print("GROQ STATUS:", res.status_code)
+        print("GROQ RESPONSE:", res.json())
+        
         return res.json()["choices"][0]["message"]["content"].strip()
 
     except Exception as e:
+        print("GROQ ERROR:", str(e))
         return str(e)
 
 # =========================
