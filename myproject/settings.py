@@ -272,6 +272,7 @@ MIDDLEWARE = [
 ]
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 ROOT_URLCONF = 'myproject.urls'
+SOCIALACCOUNT_ADAPTER = "myapp.adapters.MySocialAccountAdapter"
 
 TEMPLATES = [
     {
