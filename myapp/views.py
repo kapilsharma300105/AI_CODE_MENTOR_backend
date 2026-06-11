@@ -60,10 +60,13 @@ LANG_MAP = {
 #     except Exception as e:
 #         return str(e)
 
-
 def get_ollama_response(prompt):
     try:
         api_key = os.environ.get("GROQ_API_KEY")
+        
+        print("=== GROQ DEBUG ===")
+        print("API KEY EXISTS:", bool(api_key))
+        print("API KEY START:", api_key[:10] if api_key else "NONE")
         
         res = requests.post(
             "https://api.groq.com/openai/v1/chat/completions",
@@ -80,13 +83,27 @@ def get_ollama_response(prompt):
         )
         
         print("GROQ STATUS:", res.status_code)
-        print("GROQ RESPONSE:", res.json())
+        print("GROQ RESPONSE:", res.text[:200])  # pehle 200 chars
         
-        return res.json()["choices"][0]["message"]["content"].strip()
+        data = res.json()
+        
+        if "choices" not in data:
+            print("NO CHOICES IN RESPONSE:", data)
+            return f"Groq error: {data.get('error', {}).get('message', str(data))}"
+        
+        return data["choices"][0]["message"]["content"].strip()
 
+    except requests.exceptions.Timeout:
+        print("GROQ TIMEOUT!")
+        return "Request timed out. Please try again."
+    
+    except requests.exceptions.ConnectionError as e:
+        print("CONNECTION ERROR:", str(e))
+        return "Connection failed to Groq API."
+    
     except Exception as e:
-        print("GROQ ERROR:", str(e))
-        return str(e)
+        print("GROQ ERROR:", type(e).__name__, str(e))
+        return f"Error: {str(e)}"
 
 # =========================
 # SIGNUP
