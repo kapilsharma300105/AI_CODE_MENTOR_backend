@@ -300,6 +300,23 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 #     )
 # }
 
+
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "APP": {
+            "client_id": os.environ.get("GOOGLE_CLIENT_ID"),
+            "secret": os.environ.get("GOOGLE_CLIENT_SECRET"),
+            "key": "",
+        },
+        "SCOPE": ["profile", "email"],
+        "AUTH_PARAMS": {
+            "access_type": "online",
+        },
+    },
+    "github": {
+        "SCOPE": ["user:email"],
+    },
+}
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
 if DATABASE_URL:
@@ -406,15 +423,15 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
-SOCIALACCOUNT_PROVIDERS = {
-    "google": {
-        "SCOPE": ["profile", "email"],
-        "AUTH_PARAMS": {"access_type": "online"},
-    },
-    "github": {
-        "SCOPE": ["user:email"],
-    },
-}
+# SOCIALACCOUNT_PROVIDERS = {
+#     "google": {
+#         "SCOPE": ["profile", "email"],
+#         "AUTH_PARAMS": {"access_type": "online"},
+#     },
+#     "github": {
+#         "SCOPE": ["user:email"],
+#     },
+# }
 
 LOGIN_REDIRECT_URL = 'https://ai-code-mentor-frontend.onrender.com/dashboard'
 ACCOUNT_LOGIN_REDIRECT_URL = 'https://ai-code-mentor-frontend.onrender.com/dashboard'
