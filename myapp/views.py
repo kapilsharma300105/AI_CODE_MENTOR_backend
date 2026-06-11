@@ -253,12 +253,22 @@ def update_profile(request):
 def ai_chat(request):
     message = request.data.get("message")
 
-    prompt = f"You are a coding mentor. Explain simply:\n{message}"
+    prompt = f"""You are an expert coding mentor and teacher. A student has asked you a question.
+
+Student Question: {message}
+
+Instructions:
+- Answer clearly and in a friendly, encouraging tone
+- Use markdown formatting (headings, bullet points, bold)
+- For code examples, always use proper code blocks with language specified (```python, ```javascript etc.)
+- Give practical examples wherever possible
+- Keep explanations simple and beginner-friendly
+- End with a helpful tip or encouragement
+
+Now answer the student's question:"""
 
     reply = get_ollama_response(prompt)
-
     return Response({"reply": reply})
-
 
 # =========================
 # ANALYZE CODE
