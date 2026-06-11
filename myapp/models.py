@@ -21,19 +21,11 @@ class Profile(models.Model):
 
 # =========================
 # 💻 CODE HISTORY (RUN CODE)
-from django.db import models
-
 class CodeHistory(models.Model):
     code = models.TextField()
-    language = models.CharField(max_length=20)
     output = models.TextField()
+    language = models.CharField(max_length=20, default="python")  # ← ye hona chahiye
     created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ['-created_at']  # latest pehle
-
-    def __str__(self):
-        return f"{self.language} - {self.created_at}"
 
 # =========================
 # 💬 AI CHAT HISTORY

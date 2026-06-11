@@ -501,7 +501,11 @@ def run_code(request):
                 if result.stdout
                 else result.stderr
             )
-
+            CodeHistory.objects.create(
+            code=code,
+            output=output,
+            language=language  # agar model me language field hai
+        )
             return JsonResponse({
                 "output": output
             })
@@ -516,6 +520,8 @@ def run_code(request):
         return JsonResponse({
             "output": str(e)
         })
+    
+    
 # =========================
 # PRACTICE QUESTIONS (LEETCODE STYLE)
 # =========================
