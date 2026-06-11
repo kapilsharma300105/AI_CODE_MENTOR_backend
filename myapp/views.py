@@ -830,15 +830,18 @@ def practice_question(request):
 
 @api_view(['GET'])
 def generate_test(request):
-    easy = random.sample([q for q in QUESTIONS if q["difficulty"] == "Easy"], 3)
-    medium = random.sample([q for q in QUESTIONS if q["difficulty"] == "Medium"], 2)
+    easy = random.sample([q for q in QUESTIONS if q["difficulty"] == "Easy"], 5)
+    medium = random.sample([q for q in QUESTIONS if q["difficulty"] == "Medium"], 3)
+    hard = [q for q in QUESTIONS if q["difficulty"] == "Hard"]
+    hard_sample = random.sample(hard, min(2, len(hard)))
+
+    all_qs = easy + medium + hard_sample
+    random.shuffle(all_qs)
 
     return Response({
-        "time": 60,
-        "questions": easy + medium
+        "time": 60 * 30,  # 30 minutes in seconds
+        "questions": all_qs
     })
-    
-
 
 # =========================
 # GENERATE TEST (SAFE VERSION)
@@ -927,11 +930,29 @@ def reset_password(request):
 @api_view(['POST'])
 def test_mode(request):
     code = request.data.get("code")
+    question_title = request.data.get("title", "coding problem")
+    expected_output = request.data.get("expected_output", "")
 
     if not code:
         return Response({"result": "No code provided"})
 
-    result = get_ollama_response(code)
+    prompt = f"""You are a coding evaluator. A student submitted this code for: {question_title}
+
+CODE:
+{code}
+
+EXPECTED OUTPUT: {expected_output}
+
+Evaluate the code and respond in this format:
+- **Verdict**: Correct / Incorrect / Partially Correct
+- **What it does**: Brief explanation
+- **Issues**: Any bugs or edge cases missed
+- **Better approach**: Suggest improvement if any
+- **Score**: X/10
+
+Be encouraging and educational."""
+
+    result = get_ollama_response(prompt)
 
     return Response({"result": result})
 @api_view(['POST'])
@@ -1055,13 +1076,21 @@ def update_user_stats(user, correct):
 
     perf.save()
     
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-@login_required
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def user_data(request):
     user = request.user
-    return JsonResponse({
+    profile, _ = Profile.objects.get_or_create(user=user)
+    
+    return Response({
         "username": user.username,
         "email": user.email,
         "first_name": user.first_name,
+        "last_name": user.last_name,
+        "bio": profile.bio or "",
+        "avatar": profile.avatar.url if profile.avatar else None,
     })
