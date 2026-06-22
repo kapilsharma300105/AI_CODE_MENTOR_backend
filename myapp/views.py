@@ -122,11 +122,13 @@ def signup(request):
         password=password,
         email=email
     )
+    
+    user.is_active = True  # ✅ Yeh line add karo
+    user.save()            # ✅ Yeh bhi
 
     Profile.objects.create(user=user)
 
     return Response({"message": "Signup success"})
-
 
 # =========================
 # LOGIN
